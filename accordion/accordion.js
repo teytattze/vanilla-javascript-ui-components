@@ -49,8 +49,8 @@ export class Accordion {
 
   #afterRender() {
     const buttonEl = this.#element.querySelector(".accordion__trigger");
+
     buttonEl.addEventListener("click", () => {
-      console.log("accordion click");
       if (this.#isExpanded) {
         this.collapse();
         return;
