@@ -1,5 +1,5 @@
 export class Accordion {
-  #el;
+  #element;
   #id;
   #isExpanded;
   #title;
@@ -10,7 +10,6 @@ export class Accordion {
     this.#isExpanded = isExpanded;
     this.#title = title;
     this.#content = content;
-
     this.#render();
   }
 
@@ -25,11 +24,11 @@ export class Accordion {
   }
 
   #render() {
-    this.#processRender();
+    this.#performRender();
     this.#afterRender();
   }
 
-  #processRender() {
+  #performRender() {
     const accordionEl = createAccordionHTMLElement({
       id: this.#id,
       isExpanded: this.#isExpanded,
@@ -37,14 +36,19 @@ export class Accordion {
       content: this.#content,
     });
 
-    if (this.#el) {
-      this.#el.replaceWith(accordionEl);
+    if (this.#element) {
+      this.#element.replaceWith(accordionEl);
     }
-    this.#el = accordionEl;
+
+    // We need to update the element reference because `replaceWith` will find
+    // the element's parent and replace the element via its parent. Hence,
+    // this.#element reference will not be updated accordingly and it will
+    // still point to the old element.
+    this.#element = accordionEl;
   }
 
   #afterRender() {
-    const buttonEl = this.#el.querySelector(".accordion__trigger");
+    const buttonEl = this.#element.querySelector(".accordion__trigger");
     buttonEl.addEventListener("click", () => {
       console.log("accordion click");
       if (this.#isExpanded) {
@@ -56,7 +60,7 @@ export class Accordion {
   }
 
   get element() {
-    return this.#el;
+    return this.#element;
   }
 
   get isExpanded() {
@@ -66,9 +70,6 @@ export class Accordion {
 
 const createAccordionHTMLElement = ({ id, isExpanded, title, content }) => {
   const controlId = `accordion-content-${id}`;
-
-  const accordianEl = document.createElement("div");
-  accordianEl.setAttribute("class", "accordion");
 
   const buttonIconEl = document.createElement("span");
   buttonIconEl.setAttribute("aria-hidden", "true");
@@ -86,6 +87,8 @@ const createAccordionHTMLElement = ({ id, isExpanded, title, content }) => {
   contentEl.setAttribute("id", controlId);
   contentEl.appendChild(document.createTextNode(content));
 
+  const accordianEl = document.createElement("div");
+  accordianEl.setAttribute("class", "accordion");
   accordianEl.appendChild(buttonEl);
   accordianEl.appendChild(contentEl);
 

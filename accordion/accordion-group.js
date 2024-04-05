@@ -1,30 +1,34 @@
 export class AccordionGroup {
-  #el;
+  #element;
   #accordions;
   #disableMultipleExpansion;
 
   constructor({ accordions, disableMultipleExpansion = false }) {
     this.#accordions = accordions;
     this.#disableMultipleExpansion = disableMultipleExpansion;
-
     this.#render();
   }
 
   #render() {
-    this.#processRender();
+    this.#performRender();
     this.#afterRender();
   }
 
-  #processRender() {
+  #performRender() {
     const accordionEls = this.#accordions.map((accordion) => accordion.element);
     const accordionGroupEl = createAccordionGroupHTMLElement({
       accordionEls,
     });
 
-    if (this.#el) {
-      this.#el.replaceWith(accordionGroupEl);
+    if (this.#element) {
+      this.#element.replaceWith(accordionGroupEl);
     }
-    this.#el = accordionGroupEl;
+
+    // We need to update the element reference because `replaceWith` will find
+    // the element's parent and replace the element via its parent. Hence,
+    // this.#element reference will not be updated accordingly and it will
+    // still point to the old element.
+    this.#element = accordionGroupEl;
   }
 
   #afterRender() {
@@ -34,7 +38,7 @@ export class AccordionGroup {
   }
 
   #setupDisableMultipleExpansion() {
-    this.#el.addEventListener(
+    this.#element.addEventListener(
       "click",
       (event) => {
         const targetNode = event.target.closest(".accordion");
@@ -51,7 +55,7 @@ export class AccordionGroup {
   }
 
   get element() {
-    return this.#el;
+    return this.#element;
   }
 }
 
